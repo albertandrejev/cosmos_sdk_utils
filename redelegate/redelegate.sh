@@ -7,7 +7,7 @@ VALIDATOR_ADDRESS=$4
 ACCOUNT=$5
 CHAIN_ID=$6
 DENOM=$7
-REMAINDER=${8:=1000000}
+REMAINDER=${8:-1000000}
 
 DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS -o json | \
     /usr/bin/jq '.rewards[0].amount' | tr -d '"')

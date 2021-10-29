@@ -7,8 +7,9 @@ KEY_PASSWORD=${2}
 ACCOUNT=${3}
 TO_ADDRESS=${4}
 FEE_DENOM=${5}
-FEE_AMOUNT=${6:=200}
-NODE=${7:="http://localhost:26657"}
+FEE_AMOUNT=${6:-200}
+NODE=${7:-"http://localhost:26657"}
+PERIOD_VALUE=${8:-100}
 
 TOTAL_MESSAGES=$(cat txs.json | jq '.body.messages | length')
 
@@ -25,7 +26,7 @@ echo "Account num: $ACCOUNT_NUM"
 
 while :
 do
-    PERIOD=`expr ${ROUND} % 200` 
+    PERIOD=`expr ${ROUND} % ${PERIOD_VALUE}` 
     echo "Round ${ROUND}/${PERIOD}, sending ${TOTAL_MESSAGES} tx messages..."
       
     MEMO="Spam tx #$ROUND"

@@ -14,5 +14,6 @@ In order to run you need to provide 5 mandatory and 2 optional parameters
     <To address for send transaction> \
     <Fee denomination, for example `uatom`> \
     <Fee amount. Optional, default value is 200> \
-    <RPC node address. Optional, default value is "http://localhost:26657">     
+    <RPC node address. Optional, default value is "http://localhost:26657"> \
+    <Period value. Optional, default value is 100> \     
 ```
