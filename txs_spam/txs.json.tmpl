@@ -1,0 +1,36 @@
+{
+  "body": {
+    "messages": [
+      {
+        "@type": "/cosmos.bank.v1beta1.MsgSend",
+        "from_address": "<!#FROM_ADDRESS>",
+        "to_address": "<!#TO_ADDRESS>",
+        "amount": [
+          {
+            "denom": "ugame",
+            "amount": "1"
+          }
+        ]
+      }
+    ],
+    "memo": "<!#TX_MEMO>",
+    "timeout_height": "0",
+    "extension_options": [],
+    "non_critical_extension_options": []
+  },
+  "auth_info": {
+    "signer_infos": [],
+    "fee": {
+      "amount": [
+        {
+          "denom": "<!#FEE_DENOM>",
+          "amount": "<!#FEE_AMOUNT>"
+        }
+      ],
+      "gas_limit": "250000",
+      "payer": "",
+      "granter": ""
+    }
+  },
+  "signatures": []
+}
