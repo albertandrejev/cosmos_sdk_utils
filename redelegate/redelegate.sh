@@ -1,14 +1,13 @@
 #!/bin/bash
 
 PATH_TO_SERVICE=$1
-DELEGATOR_ADDRESS=$2
-VALIDATOR_ADDRESS=$3
-FROM=$4
-CHAIN_ID=$5
-DENOM=$6
-KEY_PASSWORD=$7
-
-REMAINDER=1000000
+KEY_PASSWORD=$2
+DELEGATOR_ADDRESS=$3
+VALIDATOR_ADDRESS=$4
+ACCOUNT=$5
+CHAIN_ID=$6
+DENOM=$7
+REMAINDER=${8:=1000000}
 
 DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS -o json | \
     /usr/bin/jq '.rewards[0].amount' | tr -d '"')
@@ -31,7 +30,7 @@ sed -i "s/<!#DENOM>/${DENOM}/g" redelegate.json
 
 
 echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx sign ./redelegate.json \
-    --from ${FROM} \
+    --from ${ACCOUNT} \
     --node http://localhost:26657 \
     --chain-id ${CHAIN_ID} \
     --output-document ./signed.json
