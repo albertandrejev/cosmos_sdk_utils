@@ -7,7 +7,8 @@ VALIDATOR_ADDRESS=$4
 ACCOUNT=$5
 CHAIN_ID=$6
 DENOM=$7
-REMAINDER=${8:-1000000}
+FEE=${8:-250}
+REMAINDER=${9:-1000000}
 
 DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS -o json | \
     /usr/bin/jq '.rewards[0].amount' | tr -d '"')
@@ -27,6 +28,7 @@ sed "s/<!#AMOUNT>/${TOTAL_REWARD}/g" redelegate-json.tmpl > redelegate.json
 sed -i "s/<!#VALIDATOR_ADDRESS>/${VALIDATOR_ADDRESS}/g" redelegate.json
 sed -i "s/<!#DELEGATOR_ADDRESS>/${DELEGATOR_ADDRESS}/g" redelegate.json
 sed -i "s/<!#DENOM>/${DENOM}/g" redelegate.json
+sed -i "s/<!#FEE>/${FEE}/g" redelegate.json
 
 
 echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx sign ./redelegate.json \
