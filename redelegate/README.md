@@ -17,5 +17,7 @@ In order to run you need to provide 5 mandatory and 2 optional parameters
     <Cahin id> \
     <Denomination, for example `uatom`> \
     <Transaction fee. Default: 250> \
-    <Remainder of the tokens on wallet address. Default: 1000000>     
+    <Remainder of the tokens on wallet address. Default: 1000000> \
+    <Minumum reward amount to collect. Default: 10000000>    
+    <RPC Node. Default: http://localhost:26657> 
 ```

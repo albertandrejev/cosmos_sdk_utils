@@ -44,7 +44,7 @@ do
         echo "Sync broadcast mode"
     fi
 
-    if (( $PERIOD == 10 )); then
+    if (( $PERIOD == 5 )); then
         BROADCAST_MODE="async"
         echo "Async broadcast mode"
     fi
@@ -86,3 +86,19 @@ do
     ROUND=`expr ${ROUND} + 1`
 done
 
+# Spam script from Mercuri. 3 nodes in parallel
+#!/bin/bash
+seq=`nibirud q account $ADDRESS -o json | jq -r '.sequence'`
+
+while true; do
+        current_block=$(curl -s http://localhost:26657/abci_info | jq -r .result.response.last_block_height)
+        log=$(echo $PASSWORD | nibirud tx bank send $ACCOUNT $ADDRESS 10ugame --from $ACCOUNT --fees 20ugame --chain-id $CHAIN -s $(($seq)) --timeout-height $(($current_block + 5)) -y | grep raw_log)
+        seq=$(($seq + 1))
+
+        # Error handling
+        if [[ $log != "raw_log: '[]'" ]]; then
+                echo $log
+                sleep 10
+                seq=`nibirud q account $ADDRESS -o json | jq -r '.sequence'`
+        fi
+done
