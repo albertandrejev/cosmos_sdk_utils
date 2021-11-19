@@ -1,104 +1,36 @@
 #!/bin/bash
 
-#NODE=$1
-
 PATH_TO_SERVICE=${1}
 KEY_PASSWORD=${2}
 ACCOUNT=${3}
 TO_ADDRESS=${4}
-FEE_DENOM=${5}
-FEE_AMOUNT=${6:-200}
-NODE=${7:-"http://localhost:26657"}
-PERIOD_VALUE=${8:-100}
-
-TOTAL_MESSAGES=$(cat txs.json | jq '.body.messages | length')
-
-ROUND=0
-BROADCAST_MODE="async" 
-
-curl localhost:26657/unsafe_flush_mempool
+CHAIN_ID=${5}
+MEMO=${6}
+DENOM=${7}
+SEND_AMOUNT=${8:-200}
+FEE_AMOUNT=${9:-200}
+NODE=${10:-"http://localhost:26657"}
 
 SEQ=$(${PATH_TO_SERVICE} q account ${ACCOUNT} -o json | jq '.sequence | tonumber')
-ACCOUNT_NUM=$(${PATH_TO_SERVICE} q account ${ACCOUNT} -o json | jq '.account_number | tonumber')
-
-echo "Account num: $ACCOUNT_NUM"
-
 
 while :
 do
-    PERIOD=`expr ${ROUND} % ${PERIOD_VALUE}` 
-    echo "Round ${ROUND}/${PERIOD}, sending ${TOTAL_MESSAGES} tx messages..."
-      
-    MEMO="Spam tx #$ROUND"
+    CURRENT_BLOCK=$(curl -s ${NODE}/abci_info | jq -r .result.response.last_block_height)
 
-    echo "Sequence: $SEQ"        
+    TX_RESULT_RAW_LOG=$(echo $KEY_PASSWORD | $PATH_TO_SERVICE tx bank send $ACCOUNT $TO_ADDRESS \
+        ${FEE_AMOUNT}${DENOM} \
+        --fees ${FEE_AMOUNT}${DENOM} \
+        --chain-id $CHAIN_ID \
+        --output json \
+        -s $SEQ \
+        --timeout-height $(($CURRENT_BLOCK + 5)) -y | \
+        jq '.raw_log')
+    SEQ=$(($SEQ + 1))
 
     if [[ "$TX_RESULT_RAW_LOG" == *"incorrect account sequence"* ]]; then
-        SEQ=$(echo $TX_RESULT_RAW_LOG | sed 's/.* expected \([0-9]*\).*/\1/')
-        echo $SEQ
         echo $TX_RESULT_RAW_LOG
+        sleep 10
+        SEQ=$(${PATH_TO_SERVICE} q account ${ACCOUNT} -o json | jq '.sequence | tonumber')
+        echo $SEQ        
     fi
-
-    if (( $PERIOD == 1 )); then
-        BROADCAST_MODE="sync"
-        echo "Sync broadcast mode"
-    fi
-
-    if (( $PERIOD == 5 )); then
-        BROADCAST_MODE="async"
-        echo "Async broadcast mode"
-    fi
-    
-
-    sed "s/<!#TX_MEMO>/${MEMO}/g" txs.json.tmpl > txs.json
-    sed -i "s/<!#FROM_ADDRESS>/${ACCOUNT}/g" txs.json
-    sed -i "s/<!#TO_ADDRESS>/${TO_ADDRESS}/g" txs.json
-    sed -i "s/<!#FEE_DENOM>/${FEE_DENOM}/g" txs.json
-    sed -i "s/<!#FEE_AMOUNT>/${FEE_AMOUNT}/g" txs.json
-
-
-    echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx sign ./txs.json \
-        --sequence $SEQ \
-        --offline \
-        --account-number $ACCOUNT_NUM \
-        --from opentech \
-        --node $NODE \
-        --chain-id neuron-1 \
-        --output-document ./signed.json
-
-    TX_RESULT_RAW_LOG=$(${PATH_TO_SERVICE} tx broadcast ./signed.json \
-        --chain-id neuron-1 \
-        --sequence $SEQ \
-        --output json \
-	    --broadcast-mode ${BROADCAST_MODE} \
-        --node $NODE | jq '.raw_log')
-
-    
-    if (( $PERIOD == 0 )); then
-        echo "Pause to process transactions ..."
-        sleep 52
-        curl localhost:26657/unsafe_flush_mempool
-        sleep 7
-    fi
-
-    
-    SEQ=`expr ${SEQ} + 1`
-    ROUND=`expr ${ROUND} + 1`
-done
-
-# Spam script from Mercuri. 3 nodes in parallel
-#!/bin/bash
-seq=`nibirud q account $ADDRESS -o json | jq -r '.sequence'`
-
-while true; do
-        current_block=$(curl -s http://localhost:26657/abci_info | jq -r .result.response.last_block_height)
-        log=$(echo $PASSWORD | nibirud tx bank send $ACCOUNT $ADDRESS 10ugame --from $ACCOUNT --fees 20ugame --chain-id $CHAIN -s $(($seq)) --timeout-height $(($current_block + 5)) -y | grep raw_log)
-        seq=$(($seq + 1))
-
-        # Error handling
-        if [[ $log != "raw_log: '[]'" ]]; then
-                echo $log
-                sleep 10
-                seq=`nibirud q account $ADDRESS -o json | jq -r '.sequence'`
-        fi
 done

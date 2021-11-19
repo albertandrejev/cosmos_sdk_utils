@@ -4,7 +4,7 @@ This script should be used to spam Cosmos SDK based networks.
 
 ### Usage
 
-In order to run you need to provide 5 mandatory and 2 optional parameters
+In order to run you need to provide 7 mandatory and 3 optional parameters
 
 ```
 ./spam_network.sh \
@@ -12,8 +12,10 @@ In order to run you need to provide 5 mandatory and 2 optional parameters
     <Password for the used account key> \
     <Account address, it also will be used as from address for send transaction> \
     <To address for send transaction> \
+    <Chain ID> \
+    <Memo for the transaction> \
     <Fee denomination, for example `uatom`> \
+    <Amount of tokens to send. Optional, default value is 200> \
     <Fee amount. Optional, default value is 200> \
-    <RPC node address. Optional, default value is "http://localhost:26657"> \
-    <Period value. Optional, default value is 100> \     
+    <RPC node address. Optional, default value is "http://localhost:26657"> \   
 ```
