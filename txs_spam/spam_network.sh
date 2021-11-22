@@ -22,6 +22,7 @@ do
         --fees ${FEE_AMOUNT}${DENOM} \
         --chain-id $CHAIN_ID \
         --output json \
+        --broadcast-mode async \
         -s $SEQ \
         --timeout-height $(($CURRENT_BLOCK + 5)) -y | \
         jq '.raw_log')
