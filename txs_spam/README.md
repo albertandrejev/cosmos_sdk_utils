@@ -17,5 +17,5 @@ In order to run you need to provide 7 mandatory and 3 optional parameters
     <Fee denomination, for example `uatom`> \
     <Amount of tokens to send. Optional, default value is 200> \
     <Fee amount. Optional, default value is 200> \
-    <RPC node address. Optional, default value is "http://localhost:26657"> \   
+    <RPC node address. Optional, default value is "http://localhost:26657">
 ```

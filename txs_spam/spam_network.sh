@@ -15,6 +15,7 @@ SEQ=$(${PATH_TO_SERVICE} q account ${ACCOUNT} -o json | jq '.sequence | tonumber
 
 while :
 do
+    echo "Running sequence: ${SEQ}"
     CURRENT_BLOCK=$(curl -s ${NODE}/abci_info | jq -r .result.response.last_block_height)
 
     TX_RESULT_RAW_LOG=$(echo $KEY_PASSWORD | $PATH_TO_SERVICE tx bank send $ACCOUNT $TO_ADDRESS \
@@ -22,16 +23,18 @@ do
         --fees ${FEE_AMOUNT}${DENOM} \
         --chain-id $CHAIN_ID \
         --output json \
+        --note $MEMO \
         --broadcast-mode async \
         -s $SEQ \
         --timeout-height $(($CURRENT_BLOCK + 5)) -y | \
         jq '.raw_log')
+
     SEQ=$(($SEQ + 1))
 
     if [[ "$TX_RESULT_RAW_LOG" == *"incorrect account sequence"* ]]; then
         echo $TX_RESULT_RAW_LOG
-        sleep 10
-        SEQ=$(${PATH_TO_SERVICE} q account ${ACCOUNT} -o json | jq '.sequence | tonumber')
-        echo $SEQ        
+        sleep 7
+        SEQ=$(echo $TX_RESULT_RAW_LOG | sed 's/.* expected \([0-9]*\).*/\1/')
+        echo $SEQ
     fi
 done
