@@ -1,8 +1,8 @@
 #!/bin/bash
 
 PATH_TO_SERVICE=$1
-NETWORK=$2
-VALIDATOR_ADDR=$3
+VALIDATOR_ADDR=$2
+NETWORK=$3
 DENOM=$4
 NODE=${5:-"http://localhost:26657"}
 
