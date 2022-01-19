@@ -18,7 +18,7 @@ DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS
 VALIDATOR_COMMISSION=$(${PATH_TO_SERVICE} q distribution commission $VALIDATOR_ADDRESS --node $NODE -o json | \
     /usr/bin/jq '.commission[0].amount' | tr -d '"')
 
-BALANCE=$(${PATH_TO_SERVICE} q bank balances $DELEGATOR_ADDRESS --node $NODE -o json | jq ".balances[0].amount | tonumber")
+BALANCE=$(${PATH_TO_SERVICE} q bank balances $DELEGATOR_ADDRESS --node $NODE -o json | jq ".balances[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
 
 echo $BALANCE
 
