@@ -33,17 +33,13 @@ get_key_address $PATH_TO_SERVICE $KEY
 DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS --node $NODE -o json | \
     /usr/bin/jq ".rewards[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
 
-VALIDATOR_COMMISSION=$(${PATH_TO_SERVICE} q distribution commission $VALIDATOR_ADDRESS --node $NODE -o json | \
-    /usr/bin/jq ".commission[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
+#DELEGATOR_REWARDS=0
 
 BALANCE=$(${PATH_TO_SERVICE} q bank balances $DELEGATOR_ADDRESS --node $NODE -o json | \
     /usr/bin/jq ".balances[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
 
-echo $BALANCE
 
-TOTAL_REWARD=$(echo $DELEGATOR_REWARDS+$VALIDATOR_COMMISSION+$BALANCE-$REMAINDER | bc | cut -f1 -d".")
-
-echo $TOTAL_REWARD
+TOTAL_REWARD=$(echo $DELEGATOR_REWARDS+$BALANCE-$REMAINDER-$FEE | bc | cut -f1 -d".")
 
 if (( $TOTAL_REWARD > $MIN_REWARD )); then
     sed "s/<!#AMOUNT>/${TOTAL_REWARD}/g" redelegate-json.tmpl > redelegate.json
@@ -54,7 +50,7 @@ if (( $TOTAL_REWARD > $MIN_REWARD )); then
 
 
     echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx sign ./redelegate.json \
-        --from ${ACCOUNT} \
+        --from ${KEY} \
         --node $NODE \
         --chain-id ${CHAIN_ID} \
         --output-document ./signed.json
@@ -62,4 +58,6 @@ if (( $TOTAL_REWARD > $MIN_REWARD )); then
     ${PATH_TO_SERVICE} tx broadcast ./signed.json \
         --chain-id ${CHAIN_ID} \
         --node $NODE
+else
+    echo "Not enough rewards. Current balance: $BALANCE, rewards to payout: $TOTAL_REWARD, min. reward limit: $MIN_REWARD"
 fi
