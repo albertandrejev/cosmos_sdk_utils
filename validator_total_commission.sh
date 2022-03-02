@@ -41,6 +41,3 @@ VALIDATOR_COMMISSION=$(${PATH_TO_SERVICE} q distribution commission $VALIDATOR_A
     /usr/bin/jq ".commission[] | select(.denom | contains(\"${DENOM}\")).amount | tonumber")
 
 
-#echo $VALIDATOR_COMMISSION
-echo "opentech_cosmos_total_commission{network=\"${NETWORK}\"} $VALIDATOR_COMMISSION" > /var/lib/node_exporter/opentech_cosmos_total_commission.prom
-
