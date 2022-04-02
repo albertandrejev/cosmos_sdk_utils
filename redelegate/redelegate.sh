@@ -84,7 +84,7 @@ if (( $TOTAL_REWARD > $MIN_REWARD )); then
 
 
     echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx sign ./redelegate.json \
-        --from ${ACCOUNT} \
+        --from ${KEY} \
         --node $NODE \
         --chain-id ${CHAIN_ID} \
         --output-document ./signed.json
