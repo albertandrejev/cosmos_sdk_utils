@@ -41,6 +41,7 @@ do
 done
 
 echo "Total compensation amount: ${TOTAL_COMPENSATION} ${DENOM}"
+echo "Delegators amount: ${DELEGATORS_AMOUNT}"
 
 get_boolean_option "Do you want to send compensation?"
 SEND_COMPENSATION=$?
@@ -67,7 +68,7 @@ SIGN_CMD=$FUNC_RETURN
 
 eval $SIGN_CMD
 
-#$PATH_TO_SERVICE tx broadcast ./signed.json \
-#    --output json \
-#    --chain-id $CHAIN_ID \
-#    --node $NODE
+$PATH_TO_SERVICE tx broadcast ./signed.json \
+    --output json \
+    --chain-id $CHAIN_ID \
+    --node $NODE
