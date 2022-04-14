@@ -40,9 +40,6 @@ network_up_and_synced () {
 
 network_up_and_synced $NODE
 
-echo "Send address state for ${ADDRESS} address: "`date`" ========================="
-
-
 ADDRESS_STATE=$(${PATH_TO_SERVICE} q bank balances $ADDRESS --node $NODE -o json | \
     /usr/bin/jq -r ".balances[] | select(.denom | contains(\"$DENOM\")).amount")
 
