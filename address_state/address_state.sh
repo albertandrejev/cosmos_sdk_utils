@@ -43,4 +43,4 @@ network_up_and_synced $NODE
 ADDRESS_STATE=$(${PATH_TO_SERVICE} q bank balances $ADDRESS --node $NODE -o json | \
     /usr/bin/jq -r ".balances[] | select(.denom | contains(\"$DENOM\")).amount")
 
-echo "opentech_address_state{name=${NAME}, address=${ADDRESS}, denom=${DENOM}} $ADDRESS_STATE" >> $METRIC_FILE
+echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
