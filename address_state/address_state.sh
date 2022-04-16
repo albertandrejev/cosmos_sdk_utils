@@ -25,9 +25,9 @@ network_up_and_synced () {
     fi
 }
 
-network_up_and_synced $NODE
+network_up_and_synced $NODE_API_URL
 
-ADDRESS_STATE=$(curl -s ${NODE}/bank/balances/${ADDRESS} | \
+ADDRESS_STATE=$(curl -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
     /usr/bin/jq -r ".result[] | select(.denom | contains(\"${DENOM}\")).amount")
 
 
