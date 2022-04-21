@@ -28,7 +28,9 @@ network_up_and_synced () {
 network_up_and_synced $NODE_API_URL
 
 ADDRESS_STATE=$(curl -m 30 -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
-    /usr/bin/jq -r ".result[] | select(.denom | contains(\"${DENOM}\")).amount")
+    /usr/bin/jq -r ".result[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
 
-
-echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
+if [ -z "$ADDRESS_STATE" ]
+then
+    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
+fi
