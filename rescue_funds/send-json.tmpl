@@ -1,9 +1,14 @@
 {
   "body": {
     "messages": [
-      <!#TXS_BATCH>
+      {
+        "@type": "/cosmos.bank.v1beta1.MsgSend",
+        "from_address": "<!#DELEGATOR_ADDRESS>",
+        "to_address": "<!#TO_ADDRESS>",
+        "amount": [{ "denom": "<!#DENOM>", "amount": "<!#AMOUNT>" }]
+      }
     ],
-    "memo": "<!#NOTE>",
+    "memo": "",
     "timeout_height": "0",
     "extension_options": [],
     "non_critical_extension_options": []
@@ -17,7 +22,7 @@
           "amount": "<!#FEE>"
         }
       ],
-      "gas_limit": "<!#GAS_LIMIT>",
+      "gas_limit": "250000",
       "payer": "",
       "granter": ""
     }

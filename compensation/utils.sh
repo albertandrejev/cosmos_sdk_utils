@@ -4,6 +4,8 @@
 RED='\033[31m'
 NC='\033[0m' # No Color
 
+WORKING_DIR="compensation_at_${HEIGHT}"
+
 get_chain_id () {
     local NODE=$1
 
@@ -33,7 +35,25 @@ get_validator_delegators () {
     fi
 
     DELEGATORS=$(echo "${VALIDATOR_DELEGATIONS}" | jq '.delegation_responses')
-    DELEGATORS_AMOUNT=$(echo "${DELEGATORS}" | jq 'length - 1')
+}
+
+get_validator_delegators_cached () {
+    DELEGATORS=$(cat ${WORKING_DIR}/delegators.json)
+    DELEGATORS_AMOUNT=$(cat ${WORKING_DIR}/delegators.json | jq 'length - 1')
+}
+
+get_total_batches () {
+    local DELEGATORS_AMOUNT=$1
+    local BATCH_SIZE=$2
+
+    TOTAL_BATCHES=$(echo "((${DELEGATORS_AMOUNT} / ${BATCH_SIZE}) + ( ${DELEGATORS_AMOUNT} % ${BATCH_SIZE} > 0 )) - 1" | bc) 
+}
+
+get_delegators_from_batch () {
+    local BATCH_NUM=$1
+
+    DELEGATORS=$(cat ${WORKING_DIR}/compensation_batch_${BATCH_NUM}.json)
+    DELEGATORS_AMOUNT=$(cat ${WORKING_DIR}/compensation_batch_${BATCH_NUM}.json | jq 'length - 1') 
 }
 
 generate_send_tx () {
