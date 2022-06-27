@@ -7,7 +7,7 @@ KEY=$4
 DENOM=$5
 FEE=${6:-250}
 REMAINDER=${7:-1000000}
-MIN_REWARD=${8:-10000000}
+MIN_REWARD=${8:-1000000}
 NODE=${9:-"http://localhost:26657"}
 
 cd $(dirname "$0")
