@@ -75,7 +75,7 @@ echo $TOTAL_REWARD
 if (( $TOTAL_REWARD > $MIN_REWARD )); then
 
     echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx wasm execute \
-        $(tgrade q poe contract-address DISTRIBUTION -o json |jq -r '.address') '{"withdraw_rewards":{}}'  \
+        $(${PATH_TO_SERVICE} q poe contract-address DISTRIBUTION -o json |jq -r '.address') '{"withdraw_rewards":{}}'  \
         --from ${KEY} \
         --fees ${FEE}${DENOM} \
         --node $NODE \
