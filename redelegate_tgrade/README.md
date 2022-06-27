@@ -8,10 +8,9 @@ In order to run it is good to use crontab job.
 In order to run you need to provide 5 mandatory and 2 optional parameters
 
 ```
-./spam_network.sh \
+./redelegate.sh \
     <Path to network service exectuable> \
     <Password for the used account key> \
-    <Delegator wallet address> \
     <Validator `...valoper1` address> \
     <Account name> \
     <Denomination, for example `uatom`> \
