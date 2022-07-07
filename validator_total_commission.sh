@@ -37,7 +37,7 @@ network_up_and_synced () {
 
 network_up_and_synced $NODE
 
-VALIDATOR_COMMISSION=$(${PATH_TO_SERVICE} q distribution commission $VALIDATOR_ADDR --node ${NODE} -o json | \
+echo $(${PATH_TO_SERVICE} q distribution commission $VALIDATOR_ADDR --node ${NODE} -o json | \
     /usr/bin/jq ".commission[] | select(.denom | contains(\"${DENOM}\")).amount | tonumber")
 
 
