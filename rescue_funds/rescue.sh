@@ -69,22 +69,12 @@ do
     TOTAL_REWARD=$(echo $BALANCE-$REMAINDER-$FEE | bc | cut -f1 -d".")
 
     if (( $TOTAL_REWARD > $MIN_REWARD )); then
-        sed "s/<!#AMOUNT>/${TOTAL_REWARD}/g" send-json.tmpl > send.json
-        sed -i "s/<!#DELEGATOR_ADDRESS>/${DELEGATOR_ADDRESS}/g" send.json
-        sed -i "s/<!#TO_ADDRESS>/${TO_ADDRESS}/g" send.json
-        sed -i "s/<!#DENOM>/${DENOM}/g" send.json
-        sed -i "s/<!#FEE>/${FEE}/g" send.json
 
-
-        echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx sign ./send.json \
-            --from ${KEY} \
+        echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx bank send ${DELEGATOR_ADDRESS} ${TO_ADDRESS} \
+            --chain-id ${CHAIN_ID} \
+            --fees ${FEE}${DENOM} \
             --node $NODE \
-            --chain-id ${CHAIN_ID} \
-            --output-document ./signed.json
-
-        ${PATH_TO_SERVICE} tx broadcast ./signed.json \
-            --chain-id ${CHAIN_ID} \
-            --node $NODE
+            -y
 
         break
     fi
