@@ -86,9 +86,6 @@ if (( $TOTAL_REWARD > $MIN_REWARD )); then
         --chain-id ${CHAIN_ID} \
         -y
 
-    echo "waiting 60 seconds..."
-    sleep 60
-
     echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx wasm execute \
         ${ENGAGEMENT_ADDRESS} '{"withdraw_rewards":{}}'  \
         --from ${KEY} \
