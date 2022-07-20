@@ -60,22 +60,37 @@ network_up_and_synced $NODE
 get_chain_id $NODE
 get_key_address $PATH_TO_SERVICE $KEY
 
+ENGAGEMENT_ADDRESS=$(${PATH_TO_SERVICE} q poe contract-address ENGAGEMENT -o json | jq -r '.address' )
+
+ENGAGEMENT_REWARD=$(${PATH_TO_SERVICE} q wasm contract-state smart ${ENGAGEMENT_ADDRESS} \
+    "{\"withdrawable_rewards\": {\"owner\": \"${VALIDATOR_ADDRESS}\"}}" -o json | \
+    /usr/bin/jq -r '.data.rewards.amount' )
+
 VALIDATOR_REWARD=$(${PATH_TO_SERVICE} q poe validator-reward $VALIDATOR_ADDRESS --node $NODE -o json | \
     /usr/bin/jq ".reward.amount | tonumber")
 
 BALANCE=$(${PATH_TO_SERVICE} q bank balances $DELEGATOR_ADDRESS --node $NODE -o json | \
     /usr/bin/jq ".balances[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
 
-echo $BALANCE
+TOTAL_REWARD=$(echo $VALIDATOR_REWARD+$BALANCE+$ENGAGEMENT_REWARD-$REMAINDER | bc | cut -f1 -d".")
 
-TOTAL_REWARD=$(echo $VALIDATOR_REWARD+$BALANCE-$REMAINDER | bc | cut -f1 -d".")
-
-echo $TOTAL_REWARD
+echo $ENGAGEMENT_REWARD $VALIDATOR_REWARD $BALANCE $TOTAL_REWARD
 
 if (( $TOTAL_REWARD > $MIN_REWARD )); then
 
     echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx wasm execute \
         $(${PATH_TO_SERVICE} q poe contract-address DISTRIBUTION -o json |jq -r '.address') '{"withdraw_rewards":{}}'  \
+        --from ${KEY} \
+        --fees ${FEE}${DENOM} \
+        --node $NODE \
+        --chain-id ${CHAIN_ID} \
+        -y
+
+    echo "waiting 60 seconds..."
+    sleep 60
+
+    echo ${KEY_PASSWORD} | ${PATH_TO_SERVICE} tx wasm execute \
+        ${ENGAGEMENT_ADDRESS} '{"withdraw_rewards":{}}'  \
         --from ${KEY} \
         --fees ${FEE}${DENOM} \
         --node $NODE \
