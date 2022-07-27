@@ -1,17 +1,16 @@
 #!/bin/bash
 
 BATCH_NUM=$1
-HEIGHT=$2
-PATH_TO_SERVICE=$3
-KEYRING_PASSWORD=$4
-VALIDATOR_ADDRESS=$5
-KEY=$6
-DENOM=$7
-FEE=${8:-250}
-GAS_LIMIT=${9:-2000000}
-KEYRING_BACKEND=${10:-"os"}
-NODE=${11:-"http://localhost:26657"}
-NOTE=${12:-"Compensation from POSTHUMAN ꝏ DVS validator. Thank you for using our services. More info about supported networks: https:\/\/posthuman.digital"}
+PATH_TO_SERVICE=$2
+KEYRING_PASSWORD=$3
+VALIDATOR_ADDRESS=$4
+KEY=$5
+DENOM=$6
+FEE=${7:-250}
+GAS_LIMIT=${8:-2000000}
+KEYRING_BACKEND=${9:-"os"}
+NODE=${10:-"http://localhost:26657"}
+NOTE=${11:-"Compensation from POSTHUMAN ꝏ DVS validator. Thank you for using our services. More info about supported networks: https:\/\/posthuman.digital"}
 
 
 source ./utils.sh
