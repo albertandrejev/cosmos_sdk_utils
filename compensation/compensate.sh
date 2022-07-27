@@ -1,18 +1,16 @@
 #!/bin/bash
 
-HEIGHT=$1
-PATH_TO_SERVICE=$2
-KEYRING_PASSWORD=$3
-VALIDATOR_ADDRESS=$4
-KEY=$5
-DENOM=$6
-FEE=${7:-250}
-GAS_LIMIT=${8:-2000000}
-BATCH_SIZE=${9:-100}
-KEYRING_BACKEND=${10:-"os"}
-NODE=${11:-"http://localhost:26657"}
-NOTE=${12:-"Compensation from POSTHUMAN ꝏ DVS validator. Thank you for using our services. More info about supported networks: https:\/\/posthuman.digital"}
-LIMIT=${13:-"100000"}
+PATH_TO_SERVICE=$1
+KEYRING_PASSWORD=$2
+VALIDATOR_ADDRESS=$3
+KEY=$4
+DENOM=$5
+FEE=${6:-250}
+GAS_LIMIT=${7:-2000000}
+BATCH_SIZE=${8:-100}
+KEYRING_BACKEND=${9:-"os"}
+NODE=${10:-"http://localhost:26657"}
+NOTE=${11:-"Compensation from POSTHUMAN ꝏ DVS validator. Thank you for using our services. More info about supported networks: https:\/\/posthuman.digital"}
 
 source ./utils.sh
 
@@ -25,7 +23,6 @@ do
     echo "Batch #${BATCH_NUM} of ${TOTAL_BATCHES}..."
     ./send_batch.sh \
     $BATCH_NUM \
-    $HEIGHT \
     $PATH_TO_SERVICE \
     $KEYRING_PASSWORD \
     $VALIDATOR_ADDRESS \
