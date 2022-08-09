@@ -3,8 +3,9 @@
 NAME=$1
 ADDRESS=$2
 DENOM=$3
-METRIC_FILE=$4
-NODE_API_URL=${5:-"http://localhost:1317"}
+DIVIDER=$4
+METRIC_FILE=$5
+NODE_API_URL=${6:-"http://localhost:1317"}
 
 cd $(dirname "$0")
 
@@ -32,5 +33,6 @@ ADDRESS_STATE=$(curl -m 30 -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
 
 if [ ! -z "$ADDRESS_STATE" ]
 then
+    ADDRESS_STATE=$(echo "${ADDRESS_STATE} / ${DIVIDER}" | bc)
     echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
 fi
