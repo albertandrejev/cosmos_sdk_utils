@@ -53,7 +53,7 @@ if [ ${WITH_DELEGATIONS,,} == "true" ]; then
 
     for DELEGATION_IDX in $( eval echo {0..$TOTAL_DELEGATIONS} )
     do
-        DELEGATION_DATA=$(echo "${DELEGATIONS}" | jq ".[$DELEGATOR_IDX]")
+        DELEGATION_DATA=$(echo "${DELEGATIONS}" | jq ".[$DELEGATION_IDX]")
         AMOUNT=$(echo "${DELEGATION_DATA}" | jq -r ".balance.amount" | xargs)
 
         if [ ! -z "$AMOUNT" ]
