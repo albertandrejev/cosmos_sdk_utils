@@ -4,10 +4,11 @@ NAME=$1
 ADDRESS=$2
 DENOM=$3
 DIVIDER=$4
-WITH_REWARDS=$5
-WITH_DELEGATIONS=$6
-METRIC_FILE=$7
-NODE_API_URL=${8:-"http://localhost:1317"}
+GET_BALANCE=$5
+GET_REWARDS=$6
+GET_DELEGATIONS=$7
+METRIC_FILE=$8
+NODE_API_URL=${9:-"http://localhost:1317"}
 
 cd $(dirname "$0")
 
@@ -30,31 +31,39 @@ network_up_and_synced () {
 
 network_up_and_synced $NODE_API_URL
 
-BALANCE=$(curl -m 30 -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
-    /usr/bin/jq -r '.result')
+TOTAL=0
 
-TOTAL_BALANCES=$(echo "${BALANCE}" | jq 'length' )
+if [ ${GET_BALANCE,,} == "true" ]; then
+    BALANCE=$(curl -m 30 -s ${NODE_API_URL}/cosmos/bank/v1beta1/balances/${ADDRESS} | \
+        /usr/bin/jq -r '.balances')
 
-if [[ $TOTAL_BALANCES > 0 ]]
-then
-    ADDRESS_STATE=$(echo "${BALANCE}" | \
-        /usr/bin/jq -r ".[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
-else
-    ADDRESS_STATE=0
+    TOTAL_BALANCES=$(echo "${BALANCE}" | jq 'length' )
+    if [ $TOTAL_BALANCES -gt 1 ]
+    then
+        ADDRESS_STATE=$(echo "${BALANCE}" | \
+            /usr/bin/jq -r ".[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
+    else
+        ADDRESS_STATE=0
+    fi
+
+    if [ ! -z "$ADDRESS_STATE" ]
+    then
+        TOTAL=$(echo "${TOTAL} + ${ADDRESS_STATE}" | bc)
+    fi
 fi
 
-if [ ${WITH_REWARDS,,} == "true" ]; then
+if [ ${GET_REWARDS,,} == "true" ]; then
     sleep 5
     REWARDS=$(curl -m 30 -s ${NODE_API_URL}/cosmos/distribution/v1beta1/delegators/${ADDRESS}/rewards | \
         /usr/bin/jq -r ".total[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
 
     if [ ! -z "$REWARDS" ]
     then
-        ADDRESS_STATE=$(echo "${ADDRESS_STATE} + ${REWARDS}" | bc)
+        TOTAL=$(echo "${TOTAL} + ${REWARDS}" | bc)
     fi
 fi
 
-if [ ${WITH_DELEGATIONS,,} == "true" ]; then
+if [ ${GET_DELEGATIONS,,} == "true" ]; then
     sleep 5
     DELEGATIONS=$(curl -m 30 -s ${NODE_API_URL}/cosmos/staking/v1beta1/delegations/${ADDRESS} | \
         /usr/bin/jq -r ".delegation_responses")
@@ -68,13 +77,13 @@ if [ ${WITH_DELEGATIONS,,} == "true" ]; then
 
         if [ ! -z "$AMOUNT" ]
         then
-            ADDRESS_STATE=$(echo "${ADDRESS_STATE} + ${AMOUNT}" | bc)
+            TOTAL=$(echo "${TOTAL} + ${AMOUNT}" | bc)
         fi
     done
 fi
 
-if [ ! -z "$ADDRESS_STATE" ]
+if [ ! -z "$TOTAL" ]
 then
-    ADDRESS_STATE=$(echo "${ADDRESS_STATE} / ${DIVIDER}" | bc)
-    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
+    TOTAL=$(echo "${TOTAL} / ${DIVIDER}" | bc)
+    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $TOTAL" >> $METRIC_FILE
 fi
