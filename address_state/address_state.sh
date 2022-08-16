@@ -30,11 +30,16 @@ network_up_and_synced () {
 
 network_up_and_synced $NODE_API_URL
 
-ADDRESS_STATE=$(curl -m 30 -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
-    /usr/bin/jq -r ".result[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
+BALANCE=$(curl -m 30 -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
+    /usr/bin/jq -r '.result')
 
-if [ -z "$ADDRESS_STATE" ]
+TOTAL_BALANCES=$(echo "${BALANCE}" | jq 'length' )
+
+if [[ $TOTAL_BALANCES > 0 ]]
 then
+    ADDRESS_STATE=$(echo "${BALANCE}" | \
+        /usr/bin/jq -r ".[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
+else
     ADDRESS_STATE=0
 fi
 
@@ -68,5 +73,8 @@ if [ ${WITH_DELEGATIONS,,} == "true" ]; then
     done
 fi
 
-ADDRESS_STATE=$(echo "${ADDRESS_STATE} / ${DIVIDER}" | bc)
-echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
+if [ ! -z "$ADDRESS_STATE" ]
+then
+    ADDRESS_STATE=$(echo "${ADDRESS_STATE} / ${DIVIDER}" | bc)
+    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
+fi
