@@ -33,6 +33,11 @@ network_up_and_synced $NODE_API_URL
 ADDRESS_STATE=$(curl -m 30 -s ${NODE_API_URL}/bank/balances/${ADDRESS} | \
     /usr/bin/jq -r ".result[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
 
+if [ -z "$ADDRESS_STATE" ]
+then
+    ADDRESS_STATE=0
+fi
+
 if [ ${WITH_REWARDS,,} == "true" ]; then
     sleep 5
     REWARDS=$(curl -m 30 -s ${NODE_API_URL}/cosmos/distribution/v1beta1/delegators/${ADDRESS}/rewards | \
@@ -63,8 +68,5 @@ if [ ${WITH_DELEGATIONS,,} == "true" ]; then
     done
 fi
 
-if [ ! -z "$ADDRESS_STATE" ]
-then
-    ADDRESS_STATE=$(echo "${ADDRESS_STATE} / ${DIVIDER}" | bc)
-    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
-fi
+ADDRESS_STATE=$(echo "${ADDRESS_STATE} / ${DIVIDER}" | bc)
+echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $ADDRESS_STATE" >> $METRIC_FILE
