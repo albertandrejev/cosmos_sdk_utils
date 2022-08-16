@@ -38,7 +38,7 @@ if [ ${GET_BALANCE,,} == "true" ]; then
         /usr/bin/jq -r '.balances')
 
     TOTAL_BALANCES=$(echo "${BALANCE}" | jq 'length' )
-    if [ $TOTAL_BALANCES -gt 1 ]
+    if [ $TOTAL_BALANCES -gt 0 ]
     then
         ADDRESS_STATE=$(echo "${BALANCE}" | \
             /usr/bin/jq -r ".[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
