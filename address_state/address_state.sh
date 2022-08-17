@@ -43,6 +43,7 @@ if [ ${GET_BALANCE,,} == "true" ]; then
         ADDRESS_STATE=$(echo "${BALANCE}" | \
             /usr/bin/jq -r ".[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
     elif [ $TOTAL_BALANCES -eq 0 ]
+    then
         ADDRESS_STATE=0
     fi
 
