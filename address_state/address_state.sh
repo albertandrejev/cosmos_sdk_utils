@@ -45,6 +45,8 @@ if [ ${GET_BALANCE,,} == "true" ]; then
     elif [ $TOTAL_BALANCES -eq 0 ]
     then
         ADDRESS_STATE=0
+    else
+        exit 3 # Balance is not available
     fi
 
     if [ ! -z "$ADDRESS_STATE" ]
