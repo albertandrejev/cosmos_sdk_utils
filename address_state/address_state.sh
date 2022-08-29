@@ -2,13 +2,14 @@
 
 NAME=$1
 ADDRESS=$2
-DENOM=$3
-DIVIDER=$4
-GET_BALANCE=$5
-GET_REWARDS=$6
-GET_DELEGATIONS=$7
-METRIC_FILE=$8
-NODE_API_URL=${9:-"http://localhost:1317"}
+ALIAS=$3
+DENOM=$4
+DIVIDER=$5
+GET_BALANCE=$6
+GET_REWARDS=$7
+GET_DELEGATIONS=$8
+METRIC_FILE=$9
+NODE_API_URL=${10:-"http://localhost:1317"}
 
 cd $(dirname "$0")
 
@@ -88,5 +89,5 @@ fi
 if [ ! -z "$TOTAL" ]
 then
     TOTAL=$(echo "${TOTAL} / ${DIVIDER}" | bc)
-    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\"} $TOTAL" >> $METRIC_FILE
+    echo "opentech_address_state{name=\"${NAME}\", address=\"${ADDRESS}\", denom=\"${DENOM}\", alias=\"${ALIAS}\"} $TOTAL" >> $METRIC_FILE
 fi
