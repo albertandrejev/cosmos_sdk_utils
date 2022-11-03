@@ -66,15 +66,15 @@ ENGAGEMENT_REWARD=$(${PATH_TO_SERVICE} q wasm contract-state smart ${ENGAGEMENT_
     "{\"withdrawable_rewards\": {\"owner\": \"${VALIDATOR_ADDRESS}\"}}" -o json | \
     /usr/bin/jq -r '.data.rewards.amount' )
 
-VALIDATOR_REWARD=$(${PATH_TO_SERVICE} q poe validator-reward $VALIDATOR_ADDRESS --node $NODE -o json | \
-    /usr/bin/jq ".reward.amount | tonumber")
+VALIDATOR_REWARD=$(${PATH_TO_SERVICE} q poe validator-reward $VALIDATOR_ADDRESS --node $NODE --distribution)
 
 BALANCE=$(${PATH_TO_SERVICE} q bank balances $DELEGATOR_ADDRESS --node $NODE -o json | \
-    /usr/bin/jq ".balances[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
+    /usr/bin/jq -r ".balances[] | select(.denom | contains(\"$DENOM\")).amount")
+echo $BALANCE
 
 TOTAL_REWARD=$(echo $VALIDATOR_REWARD+$BALANCE+$ENGAGEMENT_REWARD-$REMAINDER | bc | cut -f1 -d".")
 
-echo $ENGAGEMENT_REWARD $VALIDATOR_REWARD $BALANCE $TOTAL_REWARD
+echo "'${ENGAGEMENT_REWARD}' '${VALIDATOR_REWARD}' '${BALANCE}' '${TOTAL_REWARD}'"
 
 if (( $TOTAL_REWARD > $MIN_REWARD )); then
 

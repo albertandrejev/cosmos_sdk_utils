@@ -60,16 +60,24 @@ network_up_and_synced $NODE
 get_chain_id $NODE
 get_key_address $PATH_TO_SERVICE $KEY
 
-DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS --node $NODE -o json | \
-    /usr/bin/jq ".rewards[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
+echo "Delegator address: '${DELEGATOR_ADDRESS}'"
 
+DELEGATOR_REWARDS=$(${PATH_TO_SERVICE} q distribution rewards $DELEGATOR_ADDRESS $VALIDATOR_ADDRESS --node $NODE -o json | \
+    /usr/bin/jq -r ".rewards[] | select(.denom | startswith(\"$DENOM\")).amount")
+
+echo "Delegator rewards: '${DELEGATOR_REWARDS}'"
 #DELEGATOR_REWARDS=0
 
 BALANCE=$(${PATH_TO_SERVICE} q bank balances $DELEGATOR_ADDRESS --node $NODE -o json | \
-    /usr/bin/jq ".balances[] | select(.denom | contains(\"$DENOM\")).amount | tonumber")
+    /usr/bin/jq -r ".balances[] | select(.denom | startswith(\"$DENOM\")).amount")
 
+echo "Balance: '${BALANCE}'"
 
 TOTAL_REWARD=$(echo $DELEGATOR_REWARDS+$BALANCE-$REMAINDER-$FEE | bc | cut -f1 -d".")
+
+echo "Total reward: '${TOTAL_REWARD}'"
+
+echo "$TOTAL_REWARD, $DELEGATOR_REWARDS, $BALANCE, $REMAINDER, $FEE"
 
 if (( $TOTAL_REWARD > $MIN_REWARD )); then
     sed "s/<!#AMOUNT>/${TOTAL_REWARD}/g" redelegate-json.tmpl > redelegate.json
