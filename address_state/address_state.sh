@@ -16,13 +16,13 @@ cd $(dirname "$0")
 network_up_and_synced () {
     local NODE=$1
 
-    local NODE_STATUS_CODE=$(curl -m 5 -o /dev/null -s -w "%{http_code}\n" ${NODE}/syncing)
+    local NODE_STATUS_CODE=$(curl -m 5 -o /dev/null -s -w "%{http_code}\n" ${NODE}/cosmos/base/tendermint/v1beta1/syncing)
 
     if (( $NODE_STATUS_CODE != 200 )); then
         exit 1 # Node is not reacahble
     fi
 
-    local SYNCING_STATUS=$(curl -s ${NODE}/syncing)
+    local SYNCING_STATUS=$(curl -s ${NODE}/cosmos/base/tendermint/v1beta1/syncing)
     local CHAIN_SYNC_STATE=$(echo $CHAIN_STATUS | jq '.syncing')
     if [[ "$CHAIN_SYNC_STATE" == "true" ]]
     then
