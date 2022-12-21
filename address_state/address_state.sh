@@ -9,7 +9,7 @@ GET_BALANCE=$6
 GET_REWARDS=$7
 GET_DELEGATIONS=$8
 METRIC_FILE=$9
-OLD_RPC=$10
+OLD_REST=$10
 NODE_API_URL=${11:-"http://localhost:1317"}
 
 cd $(dirname "$0")
@@ -18,7 +18,7 @@ network_up_and_synced () {
     local NODE=$1
 
     local RPC_PATH="/cosmos/base/tendermint/v1beta1"
-    if [[ "$OLD_RPC" == "true" ]]
+    if [[ "$OLD_REST" == "true" ]]
     then
         RPC_PATH=""
     fi
