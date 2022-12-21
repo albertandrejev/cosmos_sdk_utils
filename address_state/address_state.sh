@@ -9,7 +9,7 @@ GET_BALANCE=$6
 GET_REWARDS=$7
 GET_DELEGATIONS=$8
 METRIC_FILE=$9
-OLD_REST=$10
+OLD_REST=${10}
 NODE_API_URL=${11:-"http://localhost:1317"}
 
 cd $(dirname "$0")
