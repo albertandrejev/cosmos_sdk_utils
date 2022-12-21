@@ -9,20 +9,27 @@ GET_BALANCE=$6
 GET_REWARDS=$7
 GET_DELEGATIONS=$8
 METRIC_FILE=$9
-NODE_API_URL=${10:-"http://localhost:1317"}
+OLD_RPC=$10
+NODE_API_URL=${11:-"http://localhost:1317"}
 
 cd $(dirname "$0")
 
 network_up_and_synced () {
     local NODE=$1
 
-    local NODE_STATUS_CODE=$(curl -m 5 -o /dev/null -s -w "%{http_code}\n" ${NODE}/cosmos/base/tendermint/v1beta1/syncing)
+    local RPC_PATH="/cosmos/base/tendermint/v1beta1"
+    if [[ "$OLD_RPC" == "true" ]]
+    then
+        RPC_PATH=""
+    fi
+
+    local NODE_STATUS_CODE=$(curl -m 5 -o /dev/null -s -w "%{http_code}\n" ${NODE}${RPC_PATH}/syncing)
 
     if (( $NODE_STATUS_CODE != 200 )); then
         exit 1 # Node is not reacahble
     fi
 
-    local SYNCING_STATUS=$(curl -s ${NODE}/cosmos/base/tendermint/v1beta1/syncing)
+    local SYNCING_STATUS=$(curl -s ${NODE}${RPC_PATH}/syncing)
     local CHAIN_SYNC_STATE=$(echo $CHAIN_STATUS | jq '.syncing')
     if [[ "$CHAIN_SYNC_STATE" == "true" ]]
     then
