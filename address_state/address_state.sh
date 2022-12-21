@@ -18,7 +18,7 @@ network_up_and_synced () {
     local NODE=$1
 
     local RPC_PATH="/cosmos/base/tendermint/v1beta1"
-    if [[ "$OLD_REST" == "true" ]]
+    if [[ "${OLD_REST,,}" == "true" ]]
     then
         RPC_PATH=""
     fi
