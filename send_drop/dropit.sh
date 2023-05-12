@@ -32,7 +32,4 @@ do
     $KEYRING_BACKEND \
     $NODE \
     "$NOTE"
-
-    echo "Sleeping for 100 seconds"
-    sleep 100
 done

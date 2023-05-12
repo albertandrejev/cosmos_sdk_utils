@@ -13,6 +13,11 @@ NOTE=${10:-"Stakedrop from POSTHUMAN ꝏ DVS validator. Season 1. More info abou
 
 source ./utils.sh
 
+if [ ! -f "${WORKING_DIR}/drop_batch_${BATCH_NUM}.json" ]; then
+    echo "File not exists: ${WORKING_DIR}/drop_batch_${BATCH_NUM}.json"
+    exit 1
+fi
+
 get_chain_id $NODE
 get_key_address $PATH_TO_SERVICE $KEY
 
@@ -48,7 +53,11 @@ SIGN_CMD=$FUNC_RETURN
 echo $SIGN_CMD
 
 #eval $SIGN_CMD
-#$PATH_TO_SERVICE tx broadcast ./signed.json \
-#    --output json \
-#    --chain-id $CHAIN_ID \
-#    --node $NODE
+$PATH_TO_SERVICE tx broadcast ./signed.json \
+   --output json \
+   --chain-id $CHAIN_ID \
+   --node $NODE \
+   --broadcast-mode block
+
+echo "Sleeping for 40 seconds"
+sleep 40
