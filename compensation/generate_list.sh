@@ -1,17 +1,24 @@
 #!/bin/bash
 
-PATH_TO_SERVICE=$1
-VALIDATOR_ADDRESS=$2
-HEIGHT=$3
-NODE=${4:-"http://localhost:26657"}
-LIMIT=${5:-"100000"}
+WORK_DIR=$1
 
-source ./utils.sh
+shopt -s globstar
 
-mkdir -p $WORKING_DIR
+DELEGATORS_FILE=${WORK_DIR}/delegators.json
 
-echo "Collecting data..."
+echo "[]" > ${DELEGATORS_FILE}
 
-get_validator_delegators $PATH_TO_SERVICE $VALIDATOR_ADDRESS $HEIGHT $NODE $LIMIT
+for FILE in ${WORK_DIR}/delegators_page_*.json
+do
+    if [[ ! -f "$FILE" ]]
+    then
+        continue
+    fi
 
-echo "${DELEGATORS}" > "${WORKING_DIR}/delegators.json"
+    echo "Processing ${FILE}..."
+
+    ALL_DELEGATORS=$(jq -s ".[0] + .[1].delegation_responses" ${DELEGATORS_FILE} ${FILE})
+
+    echo "${ALL_DELEGATORS}" > ${DELEGATORS_FILE}
+done
+

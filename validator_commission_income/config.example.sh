@@ -1,0 +1,5 @@
+NODE=http://localhost:26657
+STORAGE_API_NODE=http://localhost:3000
+PATH_TO_SERVICE=./gaiad
+MAX_BLOCKS_TO_CHECK=100
+DENOM=uatom
