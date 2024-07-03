@@ -49,7 +49,7 @@ if [ ${GET_BALANCE,,} == "true" ]; then
     if [ $TOTAL_BALANCES -gt 0 ]
     then
         ADDRESS_STATE=$(echo "${BALANCE}" | \
-            /usr/bin/jq -r ".[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
+            /usr/bin/jq -r ".[] | select(.denom == \"${DENOM}\").amount" | xargs)
     elif [ $TOTAL_BALANCES -eq 0 ]
     then
         ADDRESS_STATE=0
@@ -66,7 +66,7 @@ fi
 if [ ${GET_REWARDS,,} == "true" ]; then
     sleep 5
     REWARDS=$(curl -m 30 -s ${NODE_API_URL}/cosmos/distribution/v1beta1/delegators/${ADDRESS}/rewards | \
-        /usr/bin/jq -r ".total[] | select(.denom | contains(\"${DENOM}\")).amount" | xargs)
+        /usr/bin/jq -r ".total[] | select(.denom == \"${DENOM}\").amount" | xargs)
 
     if [ ! -z "$REWARDS" ]
     then
